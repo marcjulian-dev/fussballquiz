@@ -10,7 +10,7 @@ const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const cfg=window.FQ_CONFIG||{};const el=document.getElementById('screen'),meta=document.getElementById('meta'),notice=document.getElementById('notice');
 const rounds=['Torhymnen & Stadionmusik','Deutschlands Fußballstadien','Internationale Weltmeisterschaften','Karlsruher SC','Rekorde & Kuriositäten'];
 const token=localStorage.getItem('fq_role')==='mod'?localStorage.getItem('fq_token'):null;
-let client,previous='', lastRound=0,transitionUntil=0, latestState=null, qrDone=false;
+let projectionStep=0;let client,previous='', lastRound=0,transitionUntil=0, latestState=null, qrDone=false;
 const headline=(title,sub)=>`<div class="tag">${esc(sub)}</div><h1>${esc(title)}</h1>`;
 function ranking(s){const all=[...(s.ranking||[])].sort((a,b)=>Number(b.points||0)-Number(a.points||0)||Number(a.table_number||0)-Number(b.table_number||0));return `<div class="gridrank">${all.map((t,i)=>`<div class="rank"><span>${i+1}. ${esc(t.name)} · Tisch ${esc(t.table_number)}</span><b>${esc(t.points)} P.</b></div>`).join('')}</div>`}
 function progress(s){const n=Math.max(0,Math.min(8,Number(s.answer_count)||0));return `<section class="progress-area" aria-label="Eingegangene Antworten"><div class="progress-head"><span>Antworten eingegangen</span><strong>${n} / 8</strong></div><div class="progress-track"><div class="progress-fill" style="width:${n/8*100}%"></div></div></section>`}
@@ -22,8 +22,10 @@ function draw(s){latestState=s;let rid=Number(s.round_id)||0;meta.textContent=ri
 if(Date.now()<transitionUntil&&rid>0){content=`<div class="transition body"><div class="tag">NÄCHSTE KATEGORIE</div><h1>Runde ${rid} von 5</h1><h2>${esc(rounds[rid-1])}</h2><p class="expl">Die nächste Frage beginnt gleich.</p></div>`}
 else if(s.show_ranking && rid===5){content=podium(s)}
 else if(s.show_ranking){content=headline('Aktuelle Rangliste',rid?`Nach Runde ${rid}`:'Das Ergebnis')+ranking(s)}
-else if(s.phase==='review' && s.resolved?.length){content=`<div class="tag">Runde ${rid} · Gemeinsame Auflösung</div><h1>Die richtigen Antworten</h1><div class="roundcards">${s.resolved.map(q=>`<div class="roundcard"><div style="color:#abc5dc">Frage ${esc(q.number)}</div><h3>${esc(q.prompt)}</h3><p>${esc(q.correct_answer)}</p></div>`).join('')}</div>`}
-else if(s.question && ['open','closed'].includes(s.phase)){let q=s.question;let opts=Array.isArray(q.choices)?q.choices:[];content=`<div class="tag">Runde ${rid} · Frage ${esc(q.question_number)} von 5${q.question_number===5?' · Bonusfrage':''}</div><h1>${esc(q.prompt)}</h1>${opts.length?`<div class="choices">${opts.map((v,i)=>`<div class="choice"><em>${'ABCD'[i]}</em><span>${esc(v)}</span></div>`).join('')}</div>`:`<div class="panel"><h2>Schätzfrage</h2><p class="expl">Tragt eure Schätzung auf dem Team-Smartphone ein.</p></div>`}${progress(s)}${s.phase==='closed'?'<p class="expl">Die Antwortabgabe ist geschlossen.</p>':''}`}
+else if(s.phase==='review' && s.resolved?.length){const visible=s.resolved.slice(0,projectionStep);content=`<div class="tag">Runde ${rid} · Gemeinsame Auflösung</div><h1>${projectionStep===0?'Die Auflösung beginnt':`Antwort ${projectionStep} von 5`}</h1>${visible.length?`<div class="roundcards">${visible.map(q=>`<div class="roundcard"><div style="color:#abc5dc">Frage ${esc(q.number)}</div><h3>${esc(q.prompt)}</h3><p>${esc(q.correct_answer)}</p></div>`).join('')}</div>`:'<div class="panel"><h2>Die Antworten folgen einzeln.</h2><p class="expl">Die Quizleitung gibt die Lösungen nacheinander frei.</p></div>'}`}
+
+else if(s.phase==='closed'){content=`<div class="transition body"><div class="tag">RUNDE ${rid} ABGESCHLOSSEN</div><h1>🔒 Antworten gesperrt</h1><p class="expl">Die Antwortabgabe ist beendet.</p><h2>Gleich folgt die gemeinsame Auflösung.</h2></div>`}
+else if(s.question && s.phase==='open'){let q=s.question;let opts=Array.isArray(q.choices)?q.choices:[];content=`<div class="tag">Runde ${rid} · Frage ${esc(q.question_number)} von 5${q.question_number===5?' · Bonusfrage':''}</div><h1>${esc(q.prompt)}</h1>${opts.length?`<div class="choices">${opts.map((v,i)=>`<div class="choice"><em>${'ABCD'[i]}</em><span>${esc(v)}</span></div>`).join('')}</div>`:`<div class="panel"><h2>Schätzfrage</h2><p class="expl">Tragt eure Schätzung auf dem Team-Smartphone ein.</p></div>`}${progress(s)}${s.phase==='closed'?'<p class="expl">Die Antwortabgabe ist geschlossen.</p>':''}`}
 else{content=welcome()}
 el.innerHTML=content;
 if(content.includes('id="qrcode"'))makeQr();
@@ -31,7 +33,12 @@ if(content.includes('id="qrcode"'))makeQr();
 async function update(){try{if(!client)return;const {data,error}=await client.rpc('quiz_state',{p_token:token});if(error)throw Error(error.message);if(!data?.ok)throw Error(data?.error||'Spielstand konnte nicht geladen werden');const rid=Number(data.round_id)||0;
 if(lastRound!==0&&rid>lastRound&&data.phase==='open'){transitionUntil=Date.now()+4500}
 lastRound=rid;
-const signature=JSON.stringify(data);
+if(data.phase==='review'){
+ const {data:proj,error:projError}=await client.rpc('quiz_projection_get',{p_token:token});
+ if(projError)throw Error(projError.message);
+ projectionStep=Number(proj?.step)||0;
+}else{projectionStep=0}
+const signature=JSON.stringify([data,projectionStep]);
 if(signature!==previous|| (transitionUntil&&Date.now()>=transitionUntil)){previous=signature;if(Date.now()>=transitionUntil)transitionUntil=0;draw(data)}notice.textContent='';}catch(e){notice.textContent='Verbindung: '+e.message;notice.className='err'}}
 document.getElementById('fullscreen').onclick=()=>{if(document.fullscreenElement)document.exitFullscreen?.();else document.documentElement.requestFullscreen?.()};
 if(!cfg.url?.startsWith('https://')||!cfg.key?.startsWith('sb_publishable_')){el.innerHTML=headline('Konfiguration fehlt','Einrichtung')+'<p class="expl">Öffne die Leinwandansicht auf GitHub Pages, neben der bestehenden config.js.</p>'}
