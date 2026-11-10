@@ -84,10 +84,10 @@ else if(s.show_ranking && rid===5){content=podium(s)}
 else if(s.show_ranking){content=headline('Aktuelle Rangliste',rid?`Nach Runde ${rid}`:'Das Ergebnis')+ranking(s)}
 else if(s.phase==='review' && s.resolved?.length){
   const all=s.resolved;
-  const step=Math.max(0,Math.min(all.length,projectionStep));
+  const step=Math.max(0,Math.min(all.length+1,projectionStep));
   if(step===0){
     content=`<div class="tag">Runde ${rid} · Gemeinsame Auflösung</div><h1>Die Auflösung beginnt</h1><div class="panel"><h2>Die Antworten folgen einzeln.</h2><p class="expl">Die Quizleitung gibt die Lösungen nacheinander frei.</p></div>`;
-  }else if(step<all.length){
+  }else if(step<=all.length){
     const item=all[step-1];
     content=`<div class="tag">Runde ${rid} · Gemeinsame Auflösung</div><h1>Antwort ${step} von ${all.length}</h1><div class="qa-stage"><section class="qa-tile question-tile"><div class="qa-label">Frage ${esc(item.number)}</div><h2>${esc(item.prompt)}</h2></section><section class="qa-tile answer-tile"><div class="qa-label">RICHTIGE ANTWORT</div><div class="qa-answer">${esc(item.correct_answer)}</div></section></div><div class="qa-counter">Auflösung ${step} / ${all.length}</div>`;
   }else{
