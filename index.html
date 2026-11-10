@@ -41,6 +41,41 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 #round{background:#FFFFFF;color:#142D55;width:100%}
 @media(max-width:520px){.top{align-items:flex-start}.top .pill{font-size:.75rem}.wrap{padding:16px 10px 60px}.grid{grid-template-columns:1fr}.opt.selected::after{display:block;margin-top:5px}}
 @media(prefers-reduced-motion:reduce){button{transition:none}}
+
+/* Laptop-Moderation: breite Steuerzentrale statt schmalem Smartphone-Layout. */
+body.moderator-desktop .wrap{max-width:1510px;padding:28px 30px 72px}
+.mod-head{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:12px}
+.mod-subtitle{margin:0;color:#365779}
+.mod-steps{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 24px}
+.mod-step{border:1px solid #B7C8E4;border-radius:999px;padding:10px 13px;background:#F2F6FE;color:#27436D;font-weight:650;font-size:.88rem}
+.mod-step.active{background:#1645A5;color:#FFFFFF;border-color:#1645A5}
+.mod-step.done{background:#E0F2EA;color:#145C3B;border-color:#8AC5A6}
+.mod-columns{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(330px,1fr);gap:22px;align-items:start}
+.mod-panel{background:#FFFFFF;border:1px solid #BCCDE6;border-radius:16px;padding:22px;box-shadow:0 8px 24px rgba(20,45,85,.06);margin-bottom:18px}
+.mod-panel h2{margin-bottom:12px}
+.mod-panel .stack button{text-align:left;font-size:.95rem;line-height:1.35;min-height:54px}
+.mod-panel .stack button.current-question{border-color:#1645A5;background:#D9E7FF;box-shadow:inset 5px 0 #1645A5}
+.mod-panel .stack button:disabled{opacity:.55}
+.mod-workflow{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin-top:14px}
+.mod-workflow button{flex:1;min-width:160px}
+.mod-workflow button.cta{background:#1645A5;color:#FFF}
+.next-round{background:#1645A5;border-color:#1645A5;font-size:1.1rem;padding:17px 24px;width:100%}
+.mod-note{background:#E9F0FF;border-left:5px solid #1645A5;border-radius:9px;padding:12px 15px;color:#142D55;line-height:1.5;margin:12px 0}
+.mod-note strong{color:#103581}
+.mod-badges{display:flex;gap:10px;flex-wrap:wrap}
+.mod-badges span{border:1px solid #B7C8E4;background:#F2F6FE;border-radius:9px;padding:9px 12px;font-weight:600}
+.mod-teams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.mod-teams .answer{margin:0}
+.mod-danger{border:1px solid #D8BAC1;background:#FFF9FA}
+.mod-danger button{border-color:#A1142C;color:#A1142C;background:#FFFFFF}
+.mod-danger button:hover:not(:disabled){background:#FDE9ED;border-color:#A1142C}
+.mod-question-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.mod-question-tools label{margin:0}
+.mod-question-tools select{width:auto;min-width:300px;margin:0}
+.mod-reveal-buttons{display:flex;flex-wrap:wrap;gap:10px}
+.mod-reveal-buttons button{flex:1;min-width:135px}
+@media(max-width:1000px){body.moderator-desktop .wrap{padding:20px 16px 60px}.mod-columns{grid-template-columns:1fr}.mod-panel{padding:17px}}
+@media(max-width:600px){.mod-question-tools select{min-width:0;width:100%}.mod-workflow button{width:100%}.mod-teams{grid-template-columns:1fr}.mod-head{align-items:flex-start;flex-direction:column}}
 </style><script src="./config.js"></script></head><body><div class="wrap"><div class="top"><strong>⚽ Das große Fußballquiz</strong><span class="pill">8 Teams · 5 Runden</span></div><div id="status" class="sub" aria-live="polite"></div><main id="app"></main></div>
 <script type="module">
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -51,15 +86,15 @@ const roundNames=['Torhymnen & Stadionmusik','Deutschlands Fußballstadien','Int
 const btn=(text,attrs='')=>`<button ${attrs}>${text}</button>`;
 const showMessage=(msg,isError=false)=>{status.textContent=msg;status.className=isError?'small error':'small muted'};
 async function rpc(name,args){let {data,error}=await client.rpc(name,args);if(error)throw Error(error.message);if(!data?.ok)throw Error(data?.error||'Unbekannter Fehler');return data}
-function logout(){token='';role='';current=null;localStorage.removeItem('fq_token');localStorage.removeItem('fq_role');lastKey='';screen='login';loginUI()}
-function loginUI(){app.innerHTML=`<section class="card"><h1>Willkommen zum Kneipenquiz!</h1><p class="muted">Ein Smartphone pro Tisch. Teamcode eingeben und gemeinsam mitraten.</p><h2>Als Team beitreten</h2><form id="teamForm"><label for="teamcode">Teamcode</label><input id="teamcode" placeholder="FQ-XXXXXXXX" required autocomplete="off">${btn('Als Team beitreten →','type="submit"')}</form><div class="divider"></div><h2>Quiz moderieren</h2><form id="modForm"><label for="pin">Moderatorcode</label><input id="pin" type="password" required autocomplete="off">${btn('Moderatorenansicht →','type="submit" class="secondary"')}</form></section>`;
+function logout(){document.body.classList.remove('moderator-desktop');token='';role='';current=null;localStorage.removeItem('fq_token');localStorage.removeItem('fq_role');lastKey='';screen='login';loginUI()}
+function loginUI(){document.body.classList.remove('moderator-desktop');app.innerHTML=`<section class="card"><h1>Willkommen zum Kneipenquiz!</h1><p class="muted">Ein Smartphone pro Tisch. Teamcode eingeben und gemeinsam mitraten.</p><h2>Als Team beitreten</h2><form id="teamForm"><label for="teamcode">Teamcode</label><input id="teamcode" placeholder="FQ-XXXXXXXX" required autocomplete="off">${btn('Als Team beitreten →','type="submit"')}</form><div class="divider"></div><h2>Quiz moderieren</h2><form id="modForm"><label for="pin">Moderatorcode</label><input id="pin" type="password" required autocomplete="off">${btn('Moderatorenansicht →','type="submit" class="secondary"')}</form></section>`;
 document.getElementById('teamForm').onsubmit=async e=>{e.preventDefault();await login('team',document.getElementById('teamcode').value)};
 document.getElementById('modForm').onsubmit=async e=>{e.preventDefault();await login('mod',document.getElementById('pin').value)}}
 async function login(type,code){if(busy)return;busy=true;try{const data=await rpc(type==='team'?'quiz_team_login':'quiz_moderator_login',{p_code:code});token=data.token;role=type;localStorage.setItem('fq_token',token);localStorage.setItem('fq_role',role);lastKey='';busy=false;showMessage('Angemeldet');await refresh(true)}catch(e){showMessage(e.message,true)}finally{busy=false}}
 async function refresh(force=false){if(!token||busy||(!force&&document.getElementById('resetArea')?.textContent?.includes('Wirklich das gesamte Quiz zurücksetzen?')))return;try{let state=await rpc('quiz_state',{p_token:token});current=state;let signature=JSON.stringify(state);if(force||signature!==lastKey){lastKey=signature;role=state.role==='moderator'?'mod':'team';if(role==='mod'){if(questions.length===0){const d=await rpc('quiz_moderator_questions',{p_token:token});questions=d.questions||[]}try{const pg=await rpc('quiz_projection_get',{p_token:token});projectionStep=pg.step||0}catch(err){projectionStep=0}try{answerStatus=await rpc('quiz_answer_status',{p_token:token})}catch(err){answerStatus={teams:[],error:err.message}}}render()}showMessage('Live-Verbindung aktiv')}catch(e){showMessage(e.message,true);if(/abgelaufen|ungültig/i.test(e.message))logout()}}
 function ranking(s){if(!s.ranking?.length)return '';const max=Math.max(1,...s.ranking.map(t=>t.points));return `<h2>Rangliste</h2>${s.ranking.map((t,i)=>`<div class="rank"><span>${i+1}. ${esc(t.name)} (Tisch ${t.table_number})</span><b>${t.points} P.</b></div><div class="bar"><div style="width:${100*t.points/max}%"></div></div>`).join('')}`}
 function resolutions(s){return s.resolved?.length?`<h2>Auflösung Runde ${s.round_id}</h2>${s.resolved.map(q=>`<div class="answer"><div class="sub">Frage ${q.number}</div><b>${esc(q.prompt)}</b><p class="success">${esc(q.correct_answer)}</p><div class="sub">${esc(q.explanation)}</div></div>`).join('')}`:''}
-function teamUI(s){const q=s.question;const mine=(s.answers||[]).find(a=>a.question_id===q?.id);let answerHtml='';if(q&&s.phase==='open'){
+function teamUI(s){document.body.classList.remove('moderator-desktop');const q=s.question;const mine=(s.answers||[]).find(a=>a.question_id===q?.id);let answerHtml='';if(q&&s.phase==='open'){
 let choices=Array.isArray(q.choices)?q.choices:[];answerHtml=choices.length?`<div class="stack">${choices.map((c,i)=>`<button class="opt ${mine?.response===c?'selected':''}" data-response="${esc(c)}">${'ABCD'[i]}. ${esc(c)}</button>`).join('')}</div>`:`<label for="num">Deine Schätzung (ganze Zahl)</label><input id="num" inputmode="numeric" type="number" min="0" step="1" value="${esc(mine?.response||'')}"><button id="sendNum">Antwort speichern</button>`;
 }
 app.innerHTML=`<section class="card"><div class="row"><h2>Teamansicht</h2>${btn('Abmelden','id="logout" class="secondary"')}</div><p class="muted">${s.round_id?'Runde '+s.round_id+' – '+roundNames[s.round_id-1]:'Warten auf die Moderation'}</p><div class="row"><span>Team: <strong>${esc(localStorage.getItem('fq_team_name')||'Team')}</strong></span>${btn('Teamname ändern','id="rename" class="secondary"')}</div><div id="renameArea"></div>${q?`<div class="sub">Frage ${q.question_number} von 5 ${q.question_number===5?'· Bonusfrage':''}</div><h2>${esc(q.prompt)}</h2>${answerHtml}<p class="sub">${mine?'Antwort gespeichert: '+esc(mine.response):'Noch keine Antwort gespeichert'}</p>`:'<p>Warte auf die nächste Frage.</p>'}${s.phase==='closed'?'<p class="pill">Antwortabgabe geschlossen</p>':''}${s.phase==='review'?resolutions(s):''}${s.show_ranking?ranking(s):''}</section>`;
@@ -71,34 +106,83 @@ document.getElementById('rename').onclick=()=>{
 app.querySelectorAll('[data-response]').forEach(el=>el.onclick=()=>submit(q.id,el.getAttribute('data-response')));
 const sn=document.getElementById('sendNum');if(sn)sn.onclick=()=>{const val=document.getElementById('num').value.trim();if(!/^\d+$/.test(val)){showMessage('Bitte eine ganze Zahl eingeben',true);return}submit(q.id,val)};
 }
-function modUI(s){const q=s.question;let available=questions.filter(x=>x.round_id===(s.round_id||1));app.innerHTML=`<section class="card"><div class="row"><h2>Moderatorenansicht</h2>${btn('Abmelden','id="logout" class="secondary"')}</div><p class="muted">Status: ${esc(s.phase)} · ${s.answer_count||0} Antworten zur aktuellen Frage</p><label for="round">Runde wählen</label><select id="round">${roundNames.map((name,i)=>`<option value="${i+1}" ${s.round_id===i+1?'selected':''}>${i+1}. ${esc(name)}</option>`).join('')}</select><div class="stack" id="questionList">${available.map(x=>`<button class="secondary" data-qid="${x.id}">${x.question_number}. ${esc(x.prompt)}</button>`).join('')}</div><div class="divider"></div>${q?`<div class="sub">Aktive Frage ${q.question_number}/5</div><h2>${esc(q.prompt)}</h2>`:''}<div class="grid">${btn('Antworten sperren','data-action="close" class="secondary"')}${btn('Runde auflösen','data-action="reveal_round" class="secondary"')}${btn('Rangliste zeigen','data-action="ranking" class="secondary"')}${btn('Zur Lobby','data-action="lobby" class="secondary"')}</div>${s.phase==='review'?`<div class="answer"><h2>Auflösung auf der Leinwand</h2><p>Aktuell eingeblendet: ${projectionStep} von 5 Antworten</p><div class="row"><button id="revealNext" ${projectionStep>=5?'disabled':''}>Nächste Lösung zeigen →</button><button id="revealPrevious" class="secondary" ${projectionStep<=0?'disabled':''}>← Zurück</button><button id="revealAll" class="secondary">Alle fünf zeigen</button></div></div>`:''}${s.phase==='review'?resolutions(s):''}<h2>Wer hat schon geantwortet?</h2><div class="sub">Nur die Abgabe wird angezeigt, keine ausgewählte Antwort.</div><div class="grid" id="answerStatus">${answerStatus?.teams?.map(t=>`<div class="answer" style="margin:2px 0">${t.submitted?'✅':'⏳'} Tisch ${t.table_number}: ${esc(t.name)}</div>`).join('')||'<p class="sub">Noch keine Statusdaten</p>'}</div>${answerStatus?.error?`<p class="error">${esc(answerStatus.error)}</p>`:''}${ranking(s)}<div class="divider"></div>${btn('Gesamtes Quiz zurücksetzen','id="reset" class="secondary"')}<div id="resetArea" aria-live="polite"></div></section>`;
-document.getElementById('logout').onclick=logout;
-for(const [id,delta] of [['revealNext',1],['revealPrevious',-1],['revealAll',99]]){
- const b=document.getElementById(id);
- if(b)b.onclick=async()=>{try{const n=delta===99?5:Math.max(0,Math.min(5,projectionStep+delta));await rpc('quiz_projection_set',{p_token:token,p_step:n});projectionStep=n;await refresh(true)}catch(e){showMessage(e.message,true)}};
-}
-const select=document.getElementById('round');select.onchange=()=>displayQuestions(+select.value);
-app.querySelectorAll('[data-qid]').forEach(el=>el.onclick=()=>act('open',+el.dataset.qid));app.querySelectorAll('[data-action]').forEach(el=>el.onclick=()=>act(el.dataset.action));document.getElementById('reset').onclick=()=>{
- const area=document.getElementById('resetArea');
- area.innerHTML='<div class="answer"><p><strong>Wirklich das gesamte Quiz zurücksetzen?</strong></p><p>Alle bisherigen Antworten und Punkte werden gelöscht. Fragen, Teamnamen und Zugangscodes bleiben erhalten.</p><div class="row"><button id="resetConfirm" type="button">Ja, Quiz zurücksetzen</button><button id="resetCancel" type="button" class="secondary">Abbrechen</button></div><p id="resetFeedback" aria-live="polite"></p></div>';
- document.getElementById('resetCancel').onclick=()=>area.replaceChildren();
- document.getElementById('resetConfirm').onclick=async()=>{
-  if(busy)return;busy=true;
-  const confirmButton=document.getElementById('resetConfirm');confirmButton.disabled=true;
-  const feedback=document.getElementById('resetFeedback');feedback.textContent='Zurücksetzen wird ausgeführt …';
-  try{
-   await rpc('quiz_reset',{p_token:token});
-   feedback.textContent='Quiz erfolgreich zurückgesetzt.';
-   busy=false;
-   await refresh(true);
-  }catch(e){
-   feedback.textContent='Zurücksetzen fehlgeschlagen: '+e.message;
-   feedback.className='error';showMessage('Zurücksetzen fehlgeschlagen: '+e.message,true);
-  }finally{busy=false;}
+function modUI(s){
+ document.body.classList.add('moderator-desktop');
+ const rid=Number(s.round_id)||0, phase=s.phase||'lobby', isReview=phase==='review', showRank=!!s.show_ranking;
+ const q=s.question, available=questions.filter(x=>Number(x.round_id)===(rid||1));
+ const nextRid=rid+1, nextReady=isReview&&showRank&&rid>0&&rid<5;
+ const reachedReview=isReview||showRank;
+ const finished=rid===5&&showRank;
+ const activeNum=Number(q?.question_number)||0;
+ const stage=showRank?4:isReview?3:phase==='closed'?2:phase==='open'?1:0;
+ const stageLabels=['Fragen spielen','Antworten sperren','Runde auflösen','Lösungen zeigen','Rangliste'];
+ const stepHtml=stageLabels.map((name,i)=>`<span class="mod-step ${i===stage?'active':i<stage?'done':''}">${i+1}. ${name}</span>`).join('');
+ const primaryTip=finished?'Alle fünf Runden sind abgeschlossen. Jetzt ist die Siegerehrung auf der Leinwand zu sehen.':
+   nextReady?`Runde ${rid} ist abgeschlossen. Starte nun Runde ${nextRid} mit einem Klick auf „Runde ${nextRid} starten“. Die erste Frage wird automatisch geöffnet.`:
+   showRank?'Rangliste wird angezeigt.':
+   isReview?`Zeige die Lösungen 1 bis 5 einzeln, danach bei Bedarf die Gesamtübersicht. Klicke anschließend auf „Rangliste zeigen“.`:
+   phase==='closed'?'Alle Antworten sind gesperrt. Jetzt „Runde auflösen“ anklicken.':
+   phase==='open'&&activeNum===5?'Bonusfrage läuft. Danach „Antworten sperren“ und „Runde auflösen“.':
+   phase==='open'?`Frage ${activeNum} ist geöffnet. Als Nächstes Frage ${Math.min(activeNum+1,5)} wählen oder nach Frage 5 die Antworten sperren.`:
+   'Zum Start Frage 1 der ersten Runde öffnen.';
+ app.innerHTML=`<section class="card">
+  <div class="mod-head"><div><h1>🎙️ Moderationspult</h1><p class="mod-subtitle">Laptop-Steuerung · ${rid?'Runde '+rid+' von 5 · '+esc(roundNames[rid-1]):'Quiz noch nicht gestartet'}</p></div>${btn('Abmelden','id="logout" class="secondary"')}</div>
+  <div class="mod-steps" aria-label="Rundenablauf">${stepHtml}</div>
+  <div class="mod-note" role="status"><strong>Jetzt dran:</strong> ${esc(primaryTip)}</div>
+  <div class="mod-badges"><span>Spielstatus: ${esc(phase)}</span><span>Frage: ${activeNum||'–'} / 5</span><span>Antworten zur aktuellen Frage: ${Number(s.answer_count)||0} / 8</span></div>
+  <div class="mod-columns" style="margin-top:22px">
+   <div>
+    <section class="mod-panel"><h2>1 · Fragen steuern</h2>
+     <div class="mod-question-tools"><label for="round">Fragenliste anzeigen</label><select id="round">${roundNames.map((name,i)=>`<option value="${i+1}" ${rid===i+1?'selected':''}>${i+1}. ${esc(name)}</option>`).join('')}</select></div>
+     <p class="sub">Die Auswahl zeigt nur die Fragen. Eine neue Runde startest Du unten mit dem eigenen Button. Frage 5 ist die Bonusfrage.</p>
+     <div class="stack" id="questionList">${available.map(x=>`<button class="secondary ${Number(q?.id)===Number(x.id)?'current-question':''}" data-qid="${x.id}">${x.question_number}. ${esc(x.prompt)}</button>`).join('')}</div>
+    </section>
+    <section class="mod-panel"><h2>2 · Runde abschließen</h2>
+      <div class="mod-workflow">${btn('🔒 Antworten sperren',`data-action="close" class="secondary" ${phase!=='open'?'disabled':''}`)}${btn('✅ Runde auflösen',`data-action="reveal_round" class="secondary" ${phase!=='closed'?'disabled':''}`)}${btn('🏆 Rangliste zeigen',`data-action="ranking" class="secondary" ${!isReview||showRank?'disabled':''}`)}</div>
+      ${isReview?`<div class="answer"><h2>Auflösung auf der Leinwand</h2><p>${projectionStep===6?'Gesamtübersicht: alle fünf Lösungen':`Aktuell eingeblendet: ${projectionStep} von 5 Antworten`}</p><div class="mod-reveal-buttons"><button id="revealNext" ${projectionStep>=5?'disabled':''}>Nächste Lösung →</button><button id="revealPrevious" class="secondary" ${projectionStep<=0?'disabled':''}>← Zurück</button><button id="revealAll" class="secondary">Alle fünf zeigen</button></div></div>`:''}
+     </section>
+    <section class="mod-panel"><h2>3 · Nächste Runde</h2>
+      ${finished?'<div class="mod-note">🏆 Quiz beendet. Die abschließende Rangliste ist bereit.</div>':
+      nextReady?`<p>Runde ${rid} ist aufgelöst und die Rangliste wurde gezeigt.</p><button id="startNextRound" class="next-round">▶ Runde ${nextRid} starten · ${esc(roundNames[nextRid-1])}</button>`:
+      `<p class="muted">${rid?`Nach „Runde auflösen“ und „Rangliste zeigen“ erscheint hier der Button für Runde ${Math.min(rid+1,5)}.`:'Starte zunächst die erste Frage von Runde 1.'}</p>`}
+      <div class="mod-workflow">${btn('Zur Lobby', 'data-action="lobby" class="secondary"')}</div>
+    </section>
+   </div>
+   <div>
+    <section class="mod-panel"><h2>Antwortstatus · 8 Teams</h2><p class="sub">Es wird nur angezeigt, ob ein Team abgegeben hat – nicht welche Antwort.</p><div class="mod-teams">${answerStatus?.teams?.map(t=>`<div class="answer">${t.submitted?'✅':'⏳'} Tisch ${esc(t.table_number)}: ${esc(t.name)}</div>`).join('')||'<p class="sub">Noch keine Statusdaten.</p>'}</div>${answerStatus?.error?`<p class="error">${esc(answerStatus.error)}</p>`:''}</section>
+    <section class="mod-panel">${ranking(s)||'<h2>Rangliste</h2><p class="muted">Noch keine Wertung vorhanden.</p>'}</section>
+    ${isReview?`<section class="mod-panel"><details><summary><strong>Richtige Antworten (nur Moderator)</strong></summary>${resolutions(s)}</details></section>`:''}
+    <section class="mod-panel mod-danger"><h2>Verwaltung</h2><p class="sub">Der Reset löscht sämtliche Antworten und Punkte. Bitte nur vor einem komplett neuen Quiz verwenden.</p>${btn('Gesamtes Quiz zurücksetzen','id="reset" class="secondary"')}<div id="resetArea" aria-live="polite"></div></section>
+   </div>
+  </div>
+ </section>`;
+ document.getElementById('logout').onclick=logout;
+ for(const [id,delta] of [['revealNext',1],['revealPrevious',-1],['revealAll',99]]){
+  const b=document.getElementById(id);if(b)b.onclick=async()=>{try{const n=delta===99?6:Math.max(0,Math.min(5,projectionStep+delta));await rpc('quiz_projection_set',{p_token:token,p_step:n});projectionStep=n;await refresh(true)}catch(e){showMessage(e.message,true)}};
+ }
+ const select=document.getElementById('round');select.onchange=()=>displayQuestions(+select.value);
+ app.querySelectorAll('[data-qid]').forEach(el=>el.onclick=()=>act('open',+el.dataset.qid));
+ app.querySelectorAll('[data-action]').forEach(el=>el.onclick=()=>act(el.dataset.action));
+ const nextBtn=document.getElementById('startNextRound');if(nextBtn)nextBtn.onclick=async()=>{
+  if(busy)return;busy=true;nextBtn.disabled=true;
+  try{await rpc('quiz_next_round',{p_token:token});projectionStep=0;busy=false;await refresh(true);showMessage(`Runde ${nextRid} gestartet – Frage 1 ist geöffnet.`)}
+  catch(e){busy=false;nextBtn.disabled=false;showMessage('Rundenstart fehlgeschlagen: '+e.message,true)}
  };
-};
+ document.getElementById('reset').onclick=()=>{
+  const area=document.getElementById('resetArea');
+  area.innerHTML='<div class="answer"><p><strong>Wirklich das gesamte Quiz zurücksetzen?</strong></p><p>Alle bisherigen Antworten und Punkte werden gelöscht. Fragen, Teamnamen und Zugangscodes bleiben erhalten.</p><div class="row"><button id="resetConfirm" type="button">Ja, Quiz zurücksetzen</button><button id="resetCancel" type="button" class="secondary">Abbrechen</button></div><p id="resetFeedback" aria-live="polite"></p></div>';
+  document.getElementById('resetCancel').onclick=()=>area.replaceChildren();
+  document.getElementById('resetConfirm').onclick=async()=>{
+   if(busy)return;busy=true;
+   const confirmButton=document.getElementById('resetConfirm');confirmButton.disabled=true;
+   const feedback=document.getElementById('resetFeedback');feedback.textContent='Zurücksetzen wird ausgeführt …';
+   try{await rpc('quiz_reset',{p_token:token});feedback.textContent='Quiz erfolgreich zurückgesetzt.';busy=false;await refresh(true)}
+   catch(e){feedback.textContent='Zurücksetzen fehlgeschlagen: '+e.message;feedback.className='error';showMessage('Zurücksetzen fehlgeschlagen: '+e.message,true)}
+   finally{busy=false}
+  };
+ };
 }
-function displayQuestions(round){const holder=document.getElementById('questionList');holder.innerHTML=questions.filter(q=>q.round_id===round).map(q=>`<button class="secondary" data-qid="${q.id}">${q.question_number}. ${esc(q.prompt)}</button>`).join('');holder.querySelectorAll('[data-qid]').forEach(el=>el.onclick=()=>act('open',+el.dataset.qid))}
+function displayQuestions(round){const holder=document.getElementById('questionList');holder.innerHTML=questions.filter(q=>Number(q.round_id)===round).map(q=>`<button class="secondary ${Number(current?.question?.id)===Number(q.id)?'current-question':''}" data-qid="${q.id}">${q.question_number}. ${esc(q.prompt)}</button>`).join('');holder.querySelectorAll('[data-qid]').forEach(el=>el.onclick=()=>act('open',+el.dataset.qid))}
 async function act(action,id=null){try{await rpc('quiz_moderator_action',{p_token:token,p_action:action,p_question_id:id});if(action==='open'||action==='lobby'){await rpc('quiz_projection_set',{p_token:token,p_step:0});projectionStep=0}await refresh(true)}catch(e){showMessage(e.message,true)}}
 async function submit(id,response){try{await rpc('quiz_submit',{p_token:token,p_question_id:id,p_response:response});await refresh(true)}catch(e){showMessage(e.message,true)}}
 function render(){if(role==='mod')modUI(current);else teamUI(current)}
