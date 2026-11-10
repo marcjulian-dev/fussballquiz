@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#08152b"><title>Fußballquiz – Leinwand</title>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#F8FAFF"><title>Fußballquiz – Leinwand</title>
 <style>
 :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#f2f7ff;background:#08152b}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#1c3859 0,#08152b 65%);min-height:100vh}.stage{max-width:1450px;min-height:100vh;margin:auto;padding:clamp(20px,3vw,52px);display:flex;flex-direction:column;gap:25px}.head{display:flex;justify-content:space-between;gap:16px;align-items:center;border-bottom:1px solid #43617d;padding-bottom:22px}.brand{font-size:clamp(19px,2.1vw,30px);font-weight:800}.meta{background:#1a354f;border:1px solid #4c7190;padding:11px 19px;border-radius:999px;font-size:clamp(15px,1.4vw,21px)}h1{font-size:clamp(38px,5vw,79px);line-height:1.15;margin:10px 0 22px}h2{font-size:clamp(24px,2.4vw,40px);margin:4px 0}.tag{color:#6ff0b0;font-size:clamp(18px,1.7vw,27px);font-weight:750;letter-spacing:.025em}.body{flex:1;display:flex;flex-direction:column;justify-content:center}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.choice{background:#203650;border:1px solid #52718c;padding:clamp(18px,2.1vw,32px);border-radius:16px;font-size:clamp(19px,2vw,34px);line-height:1.2;display:flex;gap:18px;align-items:center}.choice em{font-style:normal;color:#69edaa;font-weight:850}.panel{background:#1b3049;border:1px solid #486783;border-radius:20px;padding:30px}.answer{font-size:clamp(27px,3.3vw,52px);color:#73f4b4;font-weight:800}.expl{color:#cedae9;font-size:clamp(19px,1.7vw,29px)}.rank{display:flex;justify-content:space-between;gap:12px;padding:13px 16px;border-bottom:1px solid #385572;font-size:clamp(18px,1.7vw,27px)}.rank b{white-space:nowrap}.gridrank{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 36px}.roundcards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.roundcard{border:1px solid #45647e;background:#172c44;border-radius:12px;padding:16px}.roundcard h3{margin:6px 0;font-size:clamp(18px,1.6vw,24px)}.roundcard p{margin:8px 0;color:#78efb5;font-size:clamp(18px,1.6vw,25px);font-weight:700}.progress-area{margin-top:clamp(20px,3vw,44px);padding:20px 24px;border:1px solid #486783;border-radius:16px;background:#152a43}.progress-head{display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:clamp(18px,1.6vw,27px);font-weight:700}.progress-head strong{color:#73f4b4;font-size:clamp(24px,2.7vw,43px);white-space:nowrap}.progress-track{height:clamp(12px,1.2vw,18px);border-radius:100px;overflow:hidden;background:#415976;margin-top:16px}.progress-fill{height:100%;background:#73f4b4;border-radius:100px;transition:width .35s}.footer{display:flex;justify-content:space-between;align-items:center;color:#aabed3;font-size:clamp(12px,1.2vw,18px);padding-top:14px}.err{color:#ffb0a6}button{background:#254664;color:white;border:1px solid #53718a;border-radius:9px;font:inherit;padding:10px 14px;cursor:pointer}#controls{display:flex;gap:10px}#notice{margin-top:20px}.hide{display:none!important}@media(max-width:650px){.choices,.gridrank,.roundcards{grid-template-columns:1fr}.head{flex-wrap:wrap}.stage{gap:12px}.body{justify-content:flex-start}}
 .welcome{text-align:center;align-items:center;gap:20px}.welcome h1{margin:8px 0;font-size:clamp(46px,6vw,100px)}.join{display:flex;gap:38px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%;margin-top:18px}.qr{padding:16px;border-radius:16px;background:white;width:234px;height:234px;display:grid;place-items:center}.qr canvas,.qr img{max-width:100%}.join-url{font-size:clamp(18px,2vw,30px);overflow-wrap:anywhere;color:#a5eccc}.podium{display:flex;align-items:flex-end;justify-content:center;gap:clamp(12px,2vw,38px);margin:25px auto 35px;width:min(1050px,100%)}.podium-item{width:32%;text-align:center;min-width:0}.podium-team{font-size:clamp(17px,2vw,34px);font-weight:800;overflow-wrap:anywhere}.podium-score{font-size:clamp(15px,1.6vw,24px);color:#b7c9df;margin:8px 0 16px}.podium-step{display:grid;place-items:center;border-radius:14px 14px 0 0;color:#0b1930;font-size:clamp(32px,4vw,70px);font-weight:900;height:clamp(90px,15vw,210px);background:#b9c4d2}.podium-item:nth-child(2) .podium-step{height:clamp(130px,21vw,290px);background:#f0c75b}.podium-item:nth-child(3) .podium-step{height:clamp(70px,11vw,155px);background:#c58a61}.transition{text-align:center;align-items:center}.transition h1{font-size:clamp(40px,6vw,95px)}@media(max-width:650px){.qr{width:190px;height:190px}.podium{gap:8px}}
@@ -14,6 +14,55 @@
 .qa-answer{font-size:clamp(32px,3.6vw,62px);line-height:1.13;color:#73f4b4;font-weight:850}
 .qa-counter{font-size:clamp(16px,1.5vw,23px);color:#b8cadd;margin-top:22px}
 @media(max-width:900px){.qa-stage{grid-template-columns:1fr}.qa-tile{min-height:150px}}
+
+/* Late Night Blue — helles, kontrastreiches Leinwanddesign (v2.4)
+   Nur Styles; sämtliche Supabase- und Quizfunktionen bleiben unverändert. */
+:root{color:#142D55;background:#F8FAFF;color-scheme:light}
+body{color:#142D55;background:linear-gradient(126deg,#FFFFFF 0%,#F8FAFF 58%,#EAF1FF 100%)}
+.stage{position:relative}
+.stage:before{content:"";height:7px;position:absolute;top:0;left:clamp(20px,3vw,52px);right:clamp(20px,3vw,52px);border-radius:0 0 7px 7px;background:linear-gradient(90deg,#1645A5 0%,#4675CF 72%,#D6A13C 100%)}
+.head{border-bottom:2px solid #B6C9E6;padding-top:10px}
+.brand{color:#1645A5}
+.brand span{color:#46658A!important}
+.meta{background:#E9F0FF;border:1px solid #A9C0E8;color:#142D55;font-weight:650}
+h1,h2{color:#142D55}
+.tag{color:#1645A5}
+.choices{gap:20px}
+.choice{background:#E9F0FF;border:2px solid #A9C0E8;color:#142D55;box-shadow:0 2px 0 rgba(22,69,165,.07)}
+.choice em{color:#1645A5}
+.panel{background:#FFFFFF;border:2px solid #B4C8E4;color:#142D55}
+.answer,.roundcard p{color:#1645A5}
+.expl{color:#334E70}
+.rank{border-bottom:1px solid #BDCCE1;color:#142D55}
+.roundcard{border:1px solid #AEC3E1;background:#FFFFFF;color:#142D55;box-shadow:0 3px 12px rgba(22,69,165,.05)}
+.roundcard div[style]{color:#365D91!important}
+.roundcard h3{color:#142D55}
+.progress-area{border:2px solid #A9C0E8;background:#FFFFFF}
+.progress-head{color:#142D55}
+.progress-head strong{color:#1645A5}
+.progress-track{background:#DCE6F5}
+.progress-fill{background:#1645A5}
+.footer{color:#3D597C}
+.err{color:#A31621}
+button{background:#1645A5;color:#FFFFFF;border:2px solid #1645A5;font-weight:750}
+button:hover{background:#103780}
+button:focus-visible{outline:4px solid #D6A13C;outline-offset:3px}
+.join-url{color:#1645A5}
+.qr{border:2px solid #B6C9E6;box-shadow:0 6px 22px rgba(22,69,165,.12)}
+.podium-team{color:#142D55}
+.podium-score{color:#334E70}
+.podium-step{color:#142D55;border:1px solid #A0ADC1}
+.podium-item:nth-child(2) .podium-step{background:#FFDF8B;border-color:#B17D20}
+.podium-item:nth-child(3) .podium-step{background:#E7BF9B;border-color:#A57952}
+.qa-tile{background:#FFFFFF;border:2px solid #AEC3E1;color:#142D55;box-shadow:0 4px 16px rgba(22,69,165,.06)}
+.qa-tile .qa-label{color:#365D91}
+.qa-tile.answer-tile{background:#E9F0FF;border:2px solid #83A6DF}
+.qa-tile.answer-tile .qa-label{color:#1645A5}
+.qa-answer{color:#1645A5}
+.qa-counter{color:#3D597C}
+/* Bonusfragen bleiben auch ohne Farbwahrnehmung anhand der Textkennzeichnung erkennbar. */
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+
 </style><script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script></head><body><div class="stage"><header class="head"><div class="brand">⚽ Das große Fußballquiz <span style="color:#9db7d2;font-weight:500">· Leinwand</span></div><div id="meta" class="meta">Live-Anzeige</div></header><main id="screen" class="body"><h1>Fußballquiz</h1><p>Leinwandansicht wird geladen …</p></main><div id="notice" role="status" aria-live="polite"></div><footer class="footer"><span>8 Teams · 5 Runden · 25 Fragen</span><div id="controls"><button id="fullscreen" type="button">⛶ Vollbild</button></div></footer></div>
 <script type="module">
 import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
